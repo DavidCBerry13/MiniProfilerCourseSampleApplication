@@ -61,7 +61,6 @@ namespace InvestmentManager
             services.AddMiniProfiler(options =>
             {                
                 options.PopupRenderPosition = StackExchange.Profiling.RenderPosition.BottomLeft;
-                options.PopupStartHidden = true;
             })
             .AddEntityFramework();
             
