@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using InvestmentManager.Core;
 using InvestmentManager.DataAccess.EF;
 using Microsoft.AspNetCore.Builder;
@@ -55,7 +54,8 @@ namespace InvestmentManager
             
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+
+        // Configures the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             if (env.IsDevelopment())

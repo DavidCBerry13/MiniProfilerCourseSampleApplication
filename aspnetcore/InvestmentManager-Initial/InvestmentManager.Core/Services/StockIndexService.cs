@@ -1,7 +1,5 @@
 ﻿using InvestmentManager.Core.Common;
 using InvestmentManager.Core.Domain;
-using Microsoft.Extensions.Configuration;
-using StackExchange.Profiling;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -29,17 +27,13 @@ namespace InvestmentManager.Core.Services
             StockIndexInfo indexInfo = null;
 
             String url = $"api/StockIndexPrices/{indexCode}?tradeDate={date.Date.ToString("yyyy-MM-dd")}";
-            using (MiniProfiler.Current.Step($"Get Stock Index Info: {indexCode}"))
+            var response = await httpClient.GetAsync(url);
+
+            if (response.IsSuccessStatusCode)
             {
-                var response = await httpClient.GetAsync(url);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    indexInfo = await response.Content.ReadAsAsync<StockIndexInfo>();
-                }
-
-                return indexInfo;
+                indexInfo = await response.Content.ReadAsAsync<StockIndexInfo>();
             }
+            return indexInfo;            
         }
 
 
