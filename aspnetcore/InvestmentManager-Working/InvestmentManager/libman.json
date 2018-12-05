@@ -1,0 +1,32 @@
+{
+  "version": "1.0",
+  "defaultProvider": "cdnjs",
+  "libraries": [
+    {
+      "library": "ag-grid@18.1.1",
+      "destination": "wwwroot/lib/ag-grid/"
+    },
+    {
+      "provider": "cdnjs",
+      "library": "moment.js@2.22.2",
+      "destination": "wwwroot/lib/moment.js/"
+    },
+    {
+      "provider": "cdnjs",
+      "library": "numeral.js@2.0.6",
+      "destination": "wwwroot/lib/numeral.js/"
+    },
+    {
+      "library": "underscore.js@1.9.1",
+      "destination": "wwwroot/lib/underscore.js/"
+    },
+    {
+      "library": "Chart.js@2.7.3",
+      "destination": "wwwroot/lib/Chart.js/"
+    },
+    {
+      "library": "lodash.js@4.17.11",
+      "destination": "wwwroot/lib/lodash.js/"
+    }
+  ]
+}

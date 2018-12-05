@@ -30,7 +30,7 @@ namespace InvestmentManager.Core.Services
 
         public List<PeriodSummary> CalculatePerformance(String accountNumber)
         {
-            using (MiniProfiler.Current.Step("Calculate Account Performance"))
+            using (MiniProfiler.Current.Step("Calculate Account Rate of Return"))
             {
                 var marketValues = this.GetAccountMarketValues(accountNumber);
                 var cashFlows = this.GetAccountCashFlows(accountNumber);
@@ -41,11 +41,10 @@ namespace InvestmentManager.Core.Services
                     return new List<PeriodSummary>();
 
                 // Roll up the data into some monthly summaries
-                var monthlySummaries = new List<PeriodInfo>();
-                using (MiniProfiler.Current.Step("Summarizing Monthly Data"))
-                {
-                    monthlySummaries = this.GetMonthlySummaries(marketValues, cashFlows);
-                }
+                var monthlySummaries = MiniProfiler.Current.Inline(
+                    () => this.GetMonthlySummaries(marketValues, cashFlows),
+                    "Summarizing Monthly Data"
+                );
 
                 // Inception to Date (calculates for all periods
                 using (MiniProfiler.Current.Step("Calculating Inception to Date Performance"))
@@ -101,6 +100,10 @@ namespace InvestmentManager.Core.Services
 
         internal List<PeriodInfo> GetMonthlySummaries(List<AccountMarketValue> marketValues, List<CashFlow> cashFlows)
         {
+            // Slow this process down to simulate it taking a longer time
+            // You wouldn't do this in real life, it is just for the demo
+            Thread.Sleep(600);
+
             // We want to get the market values for all the month ends plus the first day the
             // account had funds and last day the account had funds to calc performance
             var firstMarketValueDate = marketValues.First().Date;
@@ -166,7 +169,7 @@ namespace InvestmentManager.Core.Services
             Func<DateTime, bool> isNewPeriod, Action<PeriodInfo, decimal> setPerformanceResult)
         {
             // Slow this function down to simulate a calculation process that takes longer
-            Thread.Sleep(500);
+            Thread.Sleep(250);
 
             var geometricSum = 1.0m;
             monthlySummaries
