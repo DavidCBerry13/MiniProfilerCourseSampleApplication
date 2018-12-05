@@ -33,7 +33,8 @@ namespace InvestmentManager
 
                 // Sets up the route to use for MiniProfiler resources:
                 RouteBasePath = "~/miniprofiler",
-                PopupRenderPosition = RenderPosition.BottomLeft
+                PopupRenderPosition = RenderPosition.BottomLeft,
+                PopupShowTimeWithChildren = true
             })
             .AddViewProfiling();
             MiniProfilerEF6.Initialize();
