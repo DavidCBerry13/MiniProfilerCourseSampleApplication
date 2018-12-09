@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MiniProfiler.AspNetCore.Mvc" Version="4.0.138" />
+    <PackageReference Include="MiniProfiler.Shared" Version="4.0.138" />
     <PackageReference Include="System.Data.SqlClient" Version="4.5.1" />
   </ItemGroup>
 
