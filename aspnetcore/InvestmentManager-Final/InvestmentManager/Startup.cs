@@ -57,10 +57,11 @@ namespace InvestmentManager
             //services.RegisterAdoCommonDataAccessClasses(connectionString);
             //services.RegisterDapperDataAccessClasses(connectionString);
 
-
             // For Application Services
             String stockIndexServiceUrl = this.Configuration["StockIndexServiceUrl"];
-            services.ConfigureInvestmentManagerServices(stockIndexServiceUrl);
+            //services.ConfigureStockIndexServiceHttpClientWithoutProfiler(stockIndexServiceUrl);
+            services.ConfigureStockIndexServiceHttpClientWithProfiler(stockIndexServiceUrl);
+            services.ConfigureInvestmentManagerServices();
 
             // Miniprofiler
             var miniprofilerConectionString = this.Configuration.GetConnectionString("MiniProfilerDatabase");
@@ -69,8 +70,7 @@ namespace InvestmentManager
                 options.PopupRenderPosition = StackExchange.Profiling.RenderPosition.BottomLeft;
                 options.PopupShowTimeWithChildren = true;
             })
-            .AddEntityFramework();
-            
+            .AddEntityFramework();            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

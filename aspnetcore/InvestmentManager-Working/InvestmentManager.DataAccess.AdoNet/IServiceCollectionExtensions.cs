@@ -2,7 +2,6 @@
 using InvestmentManager.DataAccess.AdoNet.SqlRepositories;
 using InvestmentManager.DataAccess.AdoNet.AdoCommonRepositories;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Text;

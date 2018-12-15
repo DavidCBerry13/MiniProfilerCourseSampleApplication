@@ -1,23 +1,21 @@
-﻿using InvestmentManager.Core.DataAccess;
+﻿using InvestmentManager.Core.Common;
+using InvestmentManager.Core.DataAccess;
 using InvestmentManager.Core.Domain;
-using StackExchange.Profiling;
-using StackExchange.Profiling.Data;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
-using System.Text;
+using System.Data;
 
-namespace InvestmentManager.DataAccess.AdoNet.SqlRepositories
+namespace InvestmentManager.DataAccess.AdoNet.Repositories
 {
-    internal class SqlAccountCashFlowsRepository : IAccountCashFlowsRepository
+    internal class AdoAccountCashFlowsRepository : BaseRepository, IAccountCashFlowsRepository
     {
 
-        internal SqlAccountCashFlowsRepository(String connectionString)
+        internal AdoAccountCashFlowsRepository(String connectionString)
+            : base(connectionString)
         {
-            _connectionString = connectionString;
+            
         }
 
-        private String _connectionString;
 
 
 
@@ -40,14 +38,15 @@ namespace InvestmentManager.DataAccess.AdoNet.SqlRepositories
         {
             List<CashFlow> cashFlows = new List<CashFlow>();
 
-            using (var con = new ProfiledDbConnection(new SqlConnection(_connectionString), MiniProfiler.Current))
+            using (IDbConnection con = this.GetConnection())
             {
                 con.Open();
-                String sql = $"{SQL} WHERE f.AccountNumber = @AccountNumber";
-                using (SqlCommand cmd = new SqlCommand(sql, con))
+                using (IDbCommand cmd = con.CreateCommand())
                 {
-                    cmd.Parameters.AddWithValue("@accountNumber", accountNumber);
-                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    cmd.CommandText = $"{SQL} WHERE f.AccountNumber = @AccountNumber";
+                    cmd.AddParameterWithValue("@accountNumber", accountNumber);
+
+                    using (IDataReader reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
                         {
@@ -66,14 +65,15 @@ namespace InvestmentManager.DataAccess.AdoNet.SqlRepositories
         {
             List<CashFlow> cashFlows = new List<CashFlow>();
 
-            using (SqlConnection con = new SqlConnection(_connectionString))
+            using (IDbConnection con = this.GetConnection())
             {
                 con.Open();
-                String sql = $"{SQL} WHERE f.AccountNumber = @AccountNumber AND ft.ExternalFlow = 1";
-                using (SqlCommand cmd = new SqlCommand(sql, con))
+                using (IDbCommand cmd = con.CreateCommand())
                 {
-                    cmd.Parameters.AddWithValue("@accountNumber", accountNumber);
-                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    cmd.CommandText = $"{SQL} WHERE f.AccountNumber = @AccountNumber AND ft.ExternalFlow = 1";
+                    cmd.AddParameterWithValue("@accountNumber", accountNumber);
+
+                    using (IDataReader reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
                         {
@@ -88,7 +88,7 @@ namespace InvestmentManager.DataAccess.AdoNet.SqlRepositories
         }
 
 
-        internal CashFlow DecodeRow(SqlDataReader reader)
+        internal CashFlow DecodeRow(IDataReader reader)
         {
             var id = reader.GetInt32(0);
             var accountNumber = reader.GetString(1);

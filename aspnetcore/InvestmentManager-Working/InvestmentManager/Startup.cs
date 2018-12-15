@@ -56,7 +56,8 @@ namespace InvestmentManager
             {
                 options.PopupRenderPosition = StackExchange.Profiling.RenderPosition.BottomLeft;
                 options.PopupShowTimeWithChildren = true;
-            });
+            })
+            .AddEntityFramework();
         }
 
 
