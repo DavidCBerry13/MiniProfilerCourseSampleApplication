@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using InvestmentManager.Core;
+using InvestmentManager.DataAccess.AdoNet;
+using InvestmentManager.DataAccess.Dapper;
 using InvestmentManager.DataAccess.EF;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -44,19 +46,17 @@ namespace InvestmentManager
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddSingleton<IConfiguration>(this.Configuration);
 
-            // For Entity Framework and our data access
+            // Configure the data access layer
             var connectionString = this.Configuration.GetConnectionString("InvestmentDatabase");
-            services.RegisterEfDataAccessClasses(connectionString, loggerFactory);
+
+            services.RegisterEfDataAccessClasses(connectionString, loggerFactory);  // For Entity Framework
+            //services.RegisterAdoNetDataAccessClasses(connectionString);           // For ADO.NET Repositories
+            //services.RegisterDapperDataAccessClasses(connectionString);           // For Dapper Repositories
+
 
             // For Application Services
             String stockIndexServiceUrl = this.Configuration["StockIndexServiceUrl"];
             services.ConfigureInvestmentManagerServices(stockIndexServiceUrl);
-
-            services.AddMiniProfiler(options =>
-            {
-                options.PopupRenderPosition = StackExchange.Profiling.RenderPosition.BottomLeft;
-                options.PopupShowTimeWithChildren = true;
-            });
         }
 
 
@@ -78,8 +78,6 @@ namespace InvestmentManager
 
             app.UseStaticFiles();
             app.UseCookiePolicy();
-
-            app.UseMiniProfiler();
 
             app.UseMvc(routes =>
             {

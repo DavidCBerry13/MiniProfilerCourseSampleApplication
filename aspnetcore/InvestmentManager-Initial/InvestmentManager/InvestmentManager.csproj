@@ -8,13 +8,13 @@
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.1.2" PrivateAssets="All" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.6" />
-    <PackageReference Include="MiniProfiler.AspNetCore.Mvc" Version="4.0.138" />
     <PackageReference Include="NLog.Web.AspNetCore" Version="4.7.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\InvestmentManager.Core\InvestmentManager.Core.csproj" />
     <ProjectReference Include="..\InvestmentManager.DataAccess.AdoNet\InvestmentManager.DataAccess.AdoNet.csproj" />
+    <ProjectReference Include="..\InvestmentManager.DataAccess.Dapper\InvestmentManager.DataAccess.Dapper.csproj" />
     <ProjectReference Include="..\InvestmentManager.DataAccess.EF\InvestmentManager.DataAccess.EF.csproj" />
   </ItemGroup>
 
