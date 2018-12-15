@@ -46,14 +46,14 @@ namespace InvestmentManager.Core.Services
                     "Summarizing Monthly Data"
                 );
 
-                // Inception to Date (calculates for all periods
+                // Inception to Date (return since the opening of the account)
                 using (MiniProfiler.Current.Step("Calculating Inception to Date Performance"))
                 {
                     this.CalcualteRateOfReturn(monthlySummaries, date => false,
                     (period, rateOfReturn) => period.InceptionToDateReturn = rateOfReturn);
                 }
 
-                // Year to Date (calculates for all periods
+                // Year to Date
                 using (MiniProfiler.Current.Step("Calculating Year to Date Performance"))
                 {
                     this.CalcualteRateOfReturn(monthlySummaries, date => date.Month == 1,

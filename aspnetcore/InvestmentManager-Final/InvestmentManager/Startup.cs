@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using InvestmentManager.Core;
+using InvestmentManager.DataAccess.AdoNet;
+using InvestmentManager.DataAccess.Dapper;
 using InvestmentManager.DataAccess.EF;
 //using InvestmentManager.DataAccess.AdoNet;
 using Microsoft.AspNetCore.Builder;
@@ -48,9 +50,13 @@ namespace InvestmentManager
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddSingleton<IConfiguration>(this.Configuration);
 
-            // For Entity Framework and our data access
+            // Register Data Access Classes
             var connectionString = this.Configuration.GetConnectionString("InvestmentDatabase");
+            
             services.RegisterEfDataAccessClasses(connectionString, loggerFactory);
+            //services.RegisterAdoCommonDataAccessClasses(connectionString);
+            //services.RegisterDapperDataAccessClasses(connectionString);
+
 
             // For Application Services
             String stockIndexServiceUrl = this.Configuration["StockIndexServiceUrl"];
