@@ -11,29 +11,30 @@ namespace InvestmentManager.Core.Services
     public class StockIndexService
     {
 
-        public StockIndexService(String baseUrl)
+        public StockIndexService(IHttpClientFactory httpClientFactory)
         {           
-            this.httpClient = new HttpClient();
-            this.httpClient.BaseAddress = new Uri(baseUrl);
+            this.httpClientFactory = httpClientFactory;
         }
 
-
-        private HttpClient httpClient;
+        private IHttpClientFactory httpClientFactory;
 
 
 
         public async Task<StockIndexInfo> GetStockIndexPrice(String indexCode, TradeDate date)
         {
-            StockIndexInfo indexInfo = null;
-
             String url = $"api/StockIndexPrices/{indexCode}?tradeDate={date.Date.ToString("yyyy-MM-dd")}";
+            var httpClient = httpClientFactory.CreateClient("StockIndexApi");
+
             var response = await httpClient.GetAsync(url);
 
             if (response.IsSuccessStatusCode)
             {
-                indexInfo = await response.Content.ReadAsAsync<StockIndexInfo>();
+                return await response.Content.ReadAsAsync<StockIndexInfo>();
             }
-            return indexInfo;            
+            else
+            {
+                return await Task.FromResult<StockIndexInfo>(null);
+            }
         }
 
 

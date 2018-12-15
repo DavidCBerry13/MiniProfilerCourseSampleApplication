@@ -53,9 +53,9 @@ namespace InvestmentManager
             //services.RegisterAdoNetDataAccessClasses(connectionString);           // For ADO.NET Repositories
             //services.RegisterDapperDataAccessClasses(connectionString);           // For Dapper Repositories
 
-
             // For Application Services
             String stockIndexServiceUrl = this.Configuration["StockIndexServiceUrl"];
+            services.ConfigureStockIndexServiceHttpClientWithoutProfiler(stockIndexServiceUrl);
             services.ConfigureInvestmentManagerServices(stockIndexServiceUrl);
         }
 

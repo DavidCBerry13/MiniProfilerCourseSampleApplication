@@ -14,7 +14,18 @@ namespace InvestmentManager.Core
             String stockIndexUrl)
         {
             services.AddScoped<RateOfReturnService, RateOfReturnService>();
-            services.AddSingleton<StockIndexService>(new StockIndexService(stockIndexUrl));
+            services.AddSingleton<StockIndexService, StockIndexService>();
         }
+
+
+        public static void ConfigureStockIndexServiceHttpClientWithoutProfiler(
+            this IServiceCollection services, String serviceUrl)
+        {
+            services.AddHttpClient("StockIndexApi", c =>
+            {
+                c.BaseAddress = new Uri(serviceUrl);
+            });
+        }
+
     }
 }
