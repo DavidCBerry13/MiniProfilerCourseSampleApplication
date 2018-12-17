@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Text;
 
-namespace InvestmentManager.DataAccess.AdoNet.AdoCommonRepositories
+namespace InvestmentManager.DataAccess.AdoNet.Repositories
 {
     internal class AdoAccountMarketValueRepository : BaseRepository, IAccountMarketValueRepository
     {

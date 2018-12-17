@@ -6,7 +6,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Text;
 
-namespace InvestmentManager.DataAccess.AdoNet.AdoCommonRepositories
+namespace InvestmentManager.DataAccess.AdoNet.Repositories
 {
     internal class BaseRepository 
     {

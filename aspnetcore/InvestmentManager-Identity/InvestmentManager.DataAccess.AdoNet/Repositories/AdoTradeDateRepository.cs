@@ -8,17 +8,16 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Text;
 
-namespace InvestmentManager.DataAccess.AdoNet.SqlRepositories
+namespace InvestmentManager.DataAccess.AdoNet.Repositories
 {
-    internal class SqlTradeDateRepository : ITradeDateRepository
+    internal class AdoTradeDateRepository : BaseRepository, ITradeDateRepository
     {
 
-        internal SqlTradeDateRepository(String connectionString)
+        internal AdoTradeDateRepository(String connectionString)
+            :base(connectionString)
         {
-            _connectionString = connectionString;
         }
 
-        private String _connectionString;
 
 
         public const String ALL_TRADE_DATES_SQL =
@@ -44,11 +43,11 @@ namespace InvestmentManager.DataAccess.AdoNet.SqlRepositories
         {
             TradeDate tradeDate = null;
 
-            using (SqlConnection con = new SqlConnection(_connectionString))
+            using (IDbConnection con = this.GetConnection())
             {
                 con.Open();
 
-                using (SqlCommand cmd = new SqlCommand(CURRENT_TRADE_DATE_SQL, con))
+                using (IDbCommand cmd = con.CreateCommand())
                 {
                     cmd.CommandText = CURRENT_TRADE_DATE_SQL;
                     using (IDataReader reader = cmd.ExecuteReader())
@@ -68,13 +67,13 @@ namespace InvestmentManager.DataAccess.AdoNet.SqlRepositories
         {
             List<TradeDate> tradeDates = new List<TradeDate>();
 
-            using (SqlConnection con = new SqlConnection(_connectionString))
+            using (IDbConnection con = this.GetConnection())
             {
-                con.Open();
-                String sql = ALL_TRADE_DATES_SQL;
-                using (SqlCommand cmd = new SqlCommand(sql, con))
+                con.Open();                
+                using (IDbCommand cmd = con.CreateCommand())
                 {
-                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    cmd.CommandText = ALL_TRADE_DATES_SQL;
+                    using (IDataReader reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
                         {

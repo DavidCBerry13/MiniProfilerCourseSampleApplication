@@ -17,6 +17,7 @@
   <ItemGroup>
     <ProjectReference Include="..\InvestmentManager.Core\InvestmentManager.Core.csproj" />
     <ProjectReference Include="..\InvestmentManager.DataAccess.AdoNet\InvestmentManager.DataAccess.AdoNet.csproj" />
+    <ProjectReference Include="..\InvestmentManager.DataAccess.Dapper\InvestmentManager.DataAccess.Dapper.csproj" />
     <ProjectReference Include="..\InvestmentManager.DataAccess.EF\InvestmentManager.DataAccess.EF.csproj" />
   </ItemGroup>
 

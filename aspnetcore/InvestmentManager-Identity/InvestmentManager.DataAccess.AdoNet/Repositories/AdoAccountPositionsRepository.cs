@@ -3,19 +3,19 @@ using InvestmentManager.Core.DataAccess;
 using InvestmentManager.Core.Domain;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
+using System.Data;
 using System.Text;
 
-namespace InvestmentManager.DataAccess.AdoNet.SqlRepositories
+namespace InvestmentManager.DataAccess.AdoNet.Repositories
 {
-    internal class SqlAccountPositionsRepository : IAccountPositionsRepository
+    internal class AdoAccountPositionsRepository : BaseRepository, IAccountPositionsRepository
     {
-        internal SqlAccountPositionsRepository(string connectionString)
+        internal AdoAccountPositionsRepository(string connectionString)
+            : base(connectionString)
         {
-            _connectionString = connectionString;
+            
         }
 
-        private String _connectionString;
 
 
         public const String SQL =
@@ -48,15 +48,17 @@ namespace InvestmentManager.DataAccess.AdoNet.SqlRepositories
         {
             List<AccountPosition> positions = new List<AccountPosition>();
 
-            using (SqlConnection con = new SqlConnection(_connectionString))
+            using (IDbConnection con = this.GetConnection() )
             {
                 con.Open();
-                var sql = $"{SQL} WHERE p.AccountNumber = @AccountNumber AND p.TradeDate = @TradeDate";
-                using (SqlCommand cmd = new SqlCommand(sql, con))
+                
+                using (IDbCommand cmd = con.CreateCommand())
                 {
-                    cmd.Parameters.AddWithValue("@AccountNumber", accountNumber);
-                    cmd.Parameters.AddWithValue("@TradeDate", tradeDate.Date);
-                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    cmd.CommandText = $"{SQL} WHERE p.AccountNumber = @AccountNumber AND p.TradeDate = @TradeDate";
+                    cmd.AddParameterWithValue("@AccountNumber", accountNumber);
+                    cmd.AddParameterWithValue("@TradeDate", tradeDate.Date);
+
+                    using (IDataReader reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
                         {
@@ -71,7 +73,7 @@ namespace InvestmentManager.DataAccess.AdoNet.SqlRepositories
 
 
 
-        public AccountPosition DecodeRow(SqlDataReader reader)
+        public AccountPosition DecodeRow(IDataReader reader)
         {
             var tradeDate = reader.GetDateTime(0);
             var accountNumber = reader.GetString(1);

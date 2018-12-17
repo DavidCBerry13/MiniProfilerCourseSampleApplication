@@ -13,35 +13,29 @@ namespace InvestmentManager.Core.Services
     public class StockIndexService
     {
 
-        public StockIndexService(String baseUrl)
+        public StockIndexService(IHttpClientFactory httpClientFactory)
         {
-            var clientHandler = new HttpClientHandler();
-            var profilingHandler = new ProfilingHttpHandler(clientHandler);            
-            this.httpClient = new HttpClient(profilingHandler);
-            this.httpClient.BaseAddress = new Uri(baseUrl);
+            this.httpClientFactory = httpClientFactory;
         }
 
-
-        private String baseUrl;
-        private HttpClient httpClient;
+        private IHttpClientFactory httpClientFactory;
 
 
 
         public async Task<StockIndexInfo> GetStockIndexPrice(String indexCode, TradeDate date)
         {
-            StockIndexInfo indexInfo = null;
-
             String url = $"api/StockIndexPrices/{indexCode}?tradeDate={date.Date.ToString("yyyy-MM-dd")}";
-            using (var timing = MiniProfiler.Current.Step($"Get Stock Index Info: {indexCode}"))
-            {
-                var response = await httpClient.GetAsync(url);
+            var httpClient = httpClientFactory.CreateClient("StockIndexApi");
 
-                if (response.IsSuccessStatusCode)
-                {
-                    indexInfo = await response.Content.ReadAsAsync<StockIndexInfo>();
-                }
-                
-                return indexInfo;
+            var response = await httpClient.GetAsync(url);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadAsAsync<StockIndexInfo>();
+            }
+            else
+            {
+                return await Task.FromResult<StockIndexInfo>(null);
             }
         }
 

@@ -3,19 +3,17 @@ using InvestmentManager.Core.DataAccess;
 using InvestmentManager.Core.Domain;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
+using System.Data;
 using System.Text;
 
-namespace InvestmentManager.DataAccess.AdoNet.SqlRepositories
+namespace InvestmentManager.DataAccess.AdoNet.Repositories
 {
-    internal class SqlInvestmentAccountRepository : IInvestmentAccountRepository
+    internal class AdoInvestmentAccountRepository : BaseRepository, IInvestmentAccountRepository
     {
-        internal SqlInvestmentAccountRepository(String connectionString)
+        internal AdoInvestmentAccountRepository(String connectionString)
+            : base(connectionString)
         {
-            _connectionString = connectionString;
         }
-
-        private String _connectionString;
 
 
         internal static String SQL =
@@ -48,15 +46,17 @@ namespace InvestmentManager.DataAccess.AdoNet.SqlRepositories
         {
             InvestmentAccount account = null;
 
-            using (SqlConnection con = new SqlConnection(_connectionString))
+            using (IDbConnection con = this.GetConnection())
             {
                 con.Open();
-                String sql = $"{SQL} WHERE a.AccountNumber = @AccountNumber";
-                using (SqlCommand cmd = new SqlCommand(sql, con))
+ 
+                using (IDbCommand cmd = con.CreateCommand() )
                 {
-                    cmd.Parameters.AddWithValue("@TradeDate", tradeDate.Date);
-                    cmd.Parameters.AddWithValue("@AccountNumber", accountNumber);
-                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    cmd.CommandText = $"{SQL} WHERE a.AccountNumber = @AccountNumber";
+                    cmd.AddParameterWithValue("@TradeDate", tradeDate.Date);
+                    cmd.AddParameterWithValue("@AccountNumber", accountNumber);
+
+                    using (IDataReader reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
                         {
@@ -73,14 +73,15 @@ namespace InvestmentManager.DataAccess.AdoNet.SqlRepositories
         {
             List<InvestmentAccount> accounts = new List<InvestmentAccount>();
 
-            using (SqlConnection con = new SqlConnection(_connectionString))
+            using (IDbConnection con = this.GetConnection())
             {
                 con.Open();
-                using (SqlCommand cmd = new SqlCommand(SQL, con))
+                using (IDbCommand cmd = con.CreateCommand())
                 {
-                    cmd.Parameters.AddWithValue("@TradeDate", tradeDate.Date);
+                    cmd.CommandText = SQL;
+                    cmd.AddParameterWithValue("@TradeDate", tradeDate.Date);
 
-                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    using (IDataReader reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
                         {
@@ -95,7 +96,7 @@ namespace InvestmentManager.DataAccess.AdoNet.SqlRepositories
         }
 
 
-        internal InvestmentAccount DecodeRow(SqlDataReader reader)
+        internal InvestmentAccount DecodeRow(IDataReader reader)
         {
             var accountNumber = reader.GetString(0);
             var accountName = reader.GetString(1);

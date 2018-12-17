@@ -3,19 +3,18 @@ using InvestmentManager.Core.DataAccess;
 using InvestmentManager.Core.Domain;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
+using System.Data;
 using System.Text;
 
-namespace InvestmentManager.DataAccess.AdoNet.SqlRepositories
+namespace InvestmentManager.DataAccess.AdoNet.Repositories
 {
-    internal class SqlSecurityRepository : ISecurityRepository
+    internal class AdoSecurityRepository : BaseRepository, ISecurityRepository
     {
-        internal SqlSecurityRepository(String connectionString)
+        internal AdoSecurityRepository(String connectionString)
+            : base(connectionString)
         {
-            _connectionString = connectionString;
         }
 
-        private String _connectionString;
 
         public const string SQL =
             @"SELECT 
@@ -43,14 +42,14 @@ namespace InvestmentManager.DataAccess.AdoNet.SqlRepositories
         {
             Security security = null;
 
-            using (SqlConnection con = new SqlConnection(_connectionString))
+            using (IDbConnection con = this.GetConnection())
             {
-                con.Open();
-                String sql = $"SQL WHERE s.Ticker = @Ticker";
-                using (SqlCommand cmd = new SqlCommand(sql, con))
+                con.Open();                
+                using (IDbCommand cmd = con.CreateCommand())
                 {
-                    cmd.Parameters.AddWithValue("@Ticker", symbol);
-                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    cmd.CommandText = $"{SQL} WHERE s.Ticker = @Ticker";
+                    cmd.AddParameterWithValue("@Ticker", symbol);
+                    using (IDataReader reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
                         {
@@ -67,13 +66,13 @@ namespace InvestmentManager.DataAccess.AdoNet.SqlRepositories
         {
             List<Security> securities = new List<Security>();
 
-            using (SqlConnection con = new SqlConnection(_connectionString))
+            using (IDbConnection con = this.GetConnection())
             {
                 con.Open();
-                String sql = SQL;
-                using (SqlCommand cmd = new SqlCommand(sql, con))
+                using (IDbCommand cmd = con.CreateCommand())
                 {
-                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    cmd.CommandText = SQL;
+                    using (IDataReader reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
                         {
@@ -88,7 +87,7 @@ namespace InvestmentManager.DataAccess.AdoNet.SqlRepositories
         }
 
 
-        public Security DecodeRow(SqlDataReader reader)
+        public Security DecodeRow(IDataReader reader)
         {
             var ticker = reader.GetString(0);
             var securityTypeCode = reader.GetString(1);
