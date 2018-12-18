@@ -1,0 +1,89 @@
+﻿@model IEnumerable<InvestmentManager.Core.Domain.TradeDate>
+
+@{
+    ViewData["Title"] = "Securities - Investment Manager";
+}
+
+<h2>Securities</h2>
+
+<div class="row">
+    <div class="col-md-6 form-inline">
+        <div class="form-group">
+            <label for="trade-date">Date</label>
+            <select id="trade-date" class="form-control" asp-items="@(@Model.OrderByDescending(x => x.Date).Select(x => new SelectListItem() { Text = x.Date.ToString("MM/dd/yyyy"), Value = x.Date.ToString("yyyy-MM-dd") } ) )"></select>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div id="securitiesGrid" style="height: 600px;width:100%;" class="ag-blue"></div>
+    </div>
+</div>
+
+
+@section Styles {
+    <link href="~/lib/ag-grid/styles/ag-grid.css" rel="stylesheet" />
+    <link href="~/lib/ag-grid/styles/theme-blue.css" rel="stylesheet" />
+}
+
+@section Scripts {
+
+    <script src="~/lib/ag-grid/ag-grid.min.noStyle.js"></script>
+    <script src="~/lib/numeral.js/numeral.min.js"></script>
+
+    <script type="text/javascript" charset="utf-8">
+
+        var gridOptions = {};
+
+        $(document).ready(function () {
+            var columnDefs = [
+                { headerName: "Symbol", width: 100, field: "symbol", sort: 'asc' },
+                { headerName: "Name", field: "name" },
+                { headerName: "Sector", field: "sector" },
+                { headerName: "Industry", field: "industry" },
+                { headerName: "Open", width: 110, headerClass: 'text-right', cellClass: 'text-right', field: "open", valueFormatter: (params) => numeral(params.value).format('$0,0.00') },
+                { headerName: "Low", width: 110, headerClass: 'text-right', cellClass: 'text-right', field: "low", valueFormatter: (params) => numeral(params.value).format('$0,0.00') },
+                { headerName: "High", width: 110, headerClass: 'text-right', cellClass: 'text-right', field: "high", valueFormatter: (params) => numeral(params.value).format('$0,0.00') },
+                { headerName: "Close", width: 110, headerClass: 'text-right', cellClass: 'text-right', field: "close", valueFormatter: (params) => numeral(params.value).format('$0,0.00') },
+                { headerName: "Change", width: 110, headerClass: 'text-right', cellClass: 'text-right', field: "change", valueFormatter: (params) => numeral(params.value).format('0,0.00') },
+                { headerName: "Change %", width: 110, headerClass: 'text-right', cellClass: 'text-right', field: "changePercent", valueFormatter: (params) => numeral(params.value / 100).format('0.00%') }
+            ];
+
+            gridOptions = {
+                columnDefs: columnDefs,
+                enableSorting: true
+            };
+
+            // Setup the AG-Grid
+            var eGridDiv = document.querySelector('#securitiesGrid');
+            new agGrid.Grid(eGridDiv, gridOptions);
+
+            // Event handler for when user selects new date
+            $('#trade-date').change(function () {
+                var tradeDate = $('#trade-date').val();
+                LoadSecurityData(tradeDate);
+            });
+
+            // Load the initial security data
+            var tradeDate = $('#trade-date').val();
+            LoadSecurityData(tradeDate);
+        });
+
+        function LoadSecurityData(tradeDate) {
+            var baseUrl = $('base').attr('href');
+            var requestUrl = baseUrl + 'api/Securities/?date=' + tradeDate;
+            var jqxhr = $.get(requestUrl)
+                .done(function (data) {
+                    gridOptions.api.setRowData(data);
+                    gridOptions.api.sizeColumnsToFit();
+                })
+                .fail(function () {
+                    alert("error");
+                })
+                .always(function () {
+                    console.log("finished");
+                });
+        }
+
+    </script>
+}
