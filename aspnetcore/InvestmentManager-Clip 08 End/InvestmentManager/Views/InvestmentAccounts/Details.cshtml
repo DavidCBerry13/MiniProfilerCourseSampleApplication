@@ -1,0 +1,221 @@
+﻿@model InvestmentManager.Models.InvestmentAccountDetailsModel
+
+@{
+    ViewData["Title"] = $"Account Details - {Model.InvestmentAccount.AccountNumber}" ; 
+}
+
+
+<div class="row">
+    <div class="col-md-9">
+        <h3>@Model.InvestmentAccount.AccountNumber - @Model.InvestmentAccount.AccountName</h3>
+    </div>
+    <div class="col-md-3">
+
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-3">
+        @Model.InvestmentAccount.Address<br />
+        @Model.InvestmentAccount.City, @Model.InvestmentAccount.State @Model.InvestmentAccount.ZipCode<br />
+    </div>
+    <div class="col-md-3">
+        <strong>Open Date:</strong> @Model.InvestmentAccount.OpenDate.ToString("MM/dd/yyyy")<br />
+        <strong>Account Type:</strong> @Model.InvestmentAccount.AccountType.Name
+    </div>
+    <div class="col-md-3 text-right">
+
+        <div class="row">
+            <div class="col-md-9 text-left"><strong>Month to Date Return:</strong></div>
+            <div class="col-md-3">@Model.CurrentPerformance?.MonthlyRateOfReturn.ToString("0.00%")</div>
+        </div>
+        <div class="row">
+            <div class="col-md-9 text-left"><strong>Year to Date Return:</strong></div>
+            <div class="col-md-3">@Model.CurrentPerformance?.YearToDateReturn.ToString("0.00%")</div>
+        </div>
+        <div class="row">
+            <div class="col-md-9 text-left"><strong>Inception to Date Return:</strong></div>
+            <div class="col-md-3">@Model.CurrentPerformance?.InceptionToDateReturn.ToString("0.00%")</div>
+        </div>
+
+    </div>
+    <div class="col-md-3 text-right" style="font-size: 250%">
+        @Model.InvestmentAccount.MarketValue.ToString("c")
+    </div>
+</div>
+
+
+<hr />
+
+
+<h4>Positions</h4>
+<div class="row">
+    <div id="myGrid" style="height: 300px;width:100%;" class="ag-blue"></div>
+</div>
+
+<hr />
+
+<div class="row">
+    <div class="col-md-5">
+        <h4>Asset Allocation</h4>
+        <div id="assetAllocationChart" style="width: 500px; height: 400px;"></div>
+    </div>
+    <div class="col-md-7">
+        <h4>Account History</h4>
+        <div id="accountHistoryChart" style="width: 600px; height: 350px;"></div>
+    </div>
+</div>
+
+
+@*<a asp-action="Index">Back to List</a>*@
+
+
+@section Styles {
+    <link href="~/lib/ag-grid/styles/ag-grid.css" rel="stylesheet" />
+    <link href="~/lib/ag-grid/styles/theme-blue.css" rel="stylesheet" />
+}
+
+@section Scripts {
+
+    <script src="~/lib/ag-grid/ag-grid.min.noStyle.js"></script>
+    <script src="~/lib/numeral.js/numeral.min.js"></script>
+    <script src="~/lib/moment.js/moment-with-locales.js"></script>
+    <script src="~/lib/lodash.js/lodash.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+    <script type="text/javascript" charset="utf-8">
+        var accountNumber = '@Model.InvestmentAccount.AccountNumber';
+        var tradeDate = '@Model.TradeDate.Date.ToString("yyyy-MM-dd")';
+    </script>
+
+
+    <script type="text/javascript">
+        google.charts.load("current", { packages: ["corechart", "line"] });
+        google.charts.setOnLoadCallback(googleChartsLoadedCallback);
+        
+        function googleChartsLoadedCallback() {
+            createAssetAllocationChart();
+            createAccountHistoryChart();
+        }
+
+        function createAssetAllocationChart() {
+            var baseUrl = $('base').attr('href');
+            var requestUrl = baseUrl + 'api/AccountPositions/' + accountNumber + '?date=' + tradeDate;
+            var jqxhr = $.get(requestUrl)
+                .done(function (data) {
+                    drawAssetAllocationChart(data);
+                })
+                .fail(function () {
+                    alert("error");
+                })
+                .always(function () {
+                    console.log("finished");
+                });
+        }
+
+        function drawAssetAllocationChart(positions) {
+            var assetAllocation = {};
+            _.forEach(positions, p => {
+                var sector = p.security.sector;
+                var sectorSummary = assetAllocation[sector];
+                if (sectorSummary == null) {
+                    assetAllocation[sector] = p.marketValue;
+                }
+                else {
+                    assetAllocation[sector] += p.marketValue;
+                }
+            });
+            console.log(assetAllocation);
+
+            // Google wants an array or arrays with the first array being the headers
+            var chartData = _.toPairs(assetAllocation);
+            chartData.unshift(["Sector", 'Market Value']);
+
+            var data = google.visualization.arrayToDataTable(chartData);
+            var options = {
+                pieHole: 0.4,
+                legend: { position: 'right' }
+            };
+
+            var chart = new google.visualization.PieChart(document.getElementById('assetAllocationChart'));
+            chart.draw(data, options);
+        }
+
+
+        function createAccountHistoryChart() {
+            var baseUrl = $('base').attr('href');
+            var requestUrl = baseUrl + 'api/AccountHistory/' + accountNumber;
+            var jqxhr = $.get(requestUrl)
+                .done(function (data) {
+                    drawAccountHistoryChart(data);
+                })
+                .fail(function () {
+                    alert("error");
+                })
+                .always(function () {
+                    console.log("finished calling " + requestUrl);
+                });
+        }
+
+        function drawAccountHistoryChart(data) {
+
+            var accountHistoryData = _.map(data,
+                (item) => [moment(item.date).format('ll'), item.marketValue]);
+
+            accountHistoryData.unshift(["Date", "Market Value"]);
+            var chartData = google.visualization.arrayToDataTable(accountHistoryData);
+
+            var options = {
+                legend: { position: 'bottom' }
+            };
+
+            var chart = new google.visualization.LineChart(document.getElementById('accountHistoryChart'));
+            chart.draw(chartData, options);
+        }
+    </script>
+
+
+
+
+    <!-- For the Positions Grid -->
+    <script type="text/javascript" charset="utf-8">
+        $(document).ready(function () {
+            var columnDefs = [
+                { headerName: "Symbol", width: 100, field: "symbol" },
+                { headerName: "Name", field: "security.name" },
+                { headerName: "Sector", field: "security.sector" },
+                { headerName: "Industry", field: "security.industry" },
+                { headerName: "Shares", width: 125, headerClass: 'text-right', cellClass: 'text-right', field: "shares", valueFormatter: (params) => numeral(params.value).format('0,0[.]00') },
+                { headerName: "Price", width: 125, headerClass: 'text-right', cellClass: 'text-right', field: "price", valueFormatter: (params) => numeral(params.value).format('$0,0.00') },
+                { headerName: "Market Value", width: 150, headerClass: 'text-right', cellClass: 'text-right', field: "marketValue", valueFormatter: (params) => numeral(params.value).format('$0,0.00'), sort: 'desc' }
+            ];
+
+            var gridOptions = {
+                columnDefs: columnDefs,
+                enableSorting: true
+            };
+
+            // lookup the container we want the Grid to use
+            var eGridDiv = document.querySelector('#myGrid');
+
+            // create the grid passing in the div to use together with the columns & data we want to use
+            new agGrid.Grid(eGridDiv, gridOptions);
+
+            var baseUrl = $('base').attr('href');
+            var requestUrl = baseUrl + 'api/AccountPositions/' + accountNumber + '?date=' + tradeDate;
+            var jqxhr = $.get(requestUrl)
+                .done(function (data) {
+                    gridOptions.api.setRowData(data);
+                    gridOptions.api.sizeColumnsToFit();
+                })
+                .fail(function () {
+                    alert("error");
+                })
+                .always(function () {
+                    console.log("finished");
+                });
+        });
+    </script>
+
+}
+

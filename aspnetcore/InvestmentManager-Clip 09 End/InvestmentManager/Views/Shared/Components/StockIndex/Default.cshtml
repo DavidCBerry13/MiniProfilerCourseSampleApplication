@@ -1,0 +1,12 @@
+﻿@model InvestmentManager.Core.Domain.StockIndexInfo
+
+<div class="col-md-3 small text-center" style="padding-top: 2px">
+    <strong>@Model.IndexShortDisplayName:</strong>
+    @Model.AdjustedClosePrice.ToString("0,0.00") 
+    @if (Model.Change > 0.0m) {
+        <i class="glyphicon glyphicon-arrow-up" style="color: green"></i>
+    } else {
+        <i class="glyphicon glyphicon-arrow-down" style="color: red"></i> }
+    @Model.Change.ToString("0,0.00")
+    @Model.ChangePercent.ToString("0.00%")
+</div>
