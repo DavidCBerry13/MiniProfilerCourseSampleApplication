@@ -32,8 +32,13 @@ namespace InvestmentManager.Core.Services
         {
             using (MiniProfiler.Current.Step("Calculate Account Rate of Return"))
             {
-                var marketValues = this.GetAccountMarketValues(accountNumber);
-                var cashFlows = this.GetAccountCashFlows(accountNumber);
+                var marketValues = new List<AccountMarketValue>();
+                var cashFlows = new List<CashFlow>();
+                using (MiniProfiler.Current.Step("Load Data For Rate of Return Calculations"))
+                {
+                    marketValues = this.GetAccountMarketValues(accountNumber);
+                    cashFlows = this.GetAccountCashFlows(accountNumber);
+                }
 
                 // If we only have one market value, the account has only been open for a day
                 // so don't bother to calcualte performance
