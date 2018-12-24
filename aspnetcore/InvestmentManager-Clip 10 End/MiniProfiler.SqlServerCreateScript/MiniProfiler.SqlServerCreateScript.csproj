@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MiniProfiler.Providers.MySql" Version="4.0.138" />
+    <PackageReference Include="MiniProfiler.Providers.Redis" Version="4.0.138" />
+    <PackageReference Include="MiniProfiler.Providers.SqlServer" Version="4.0.138" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,87 @@
+﻿@using System.Collections.Generic
+@using System.Linq
+@using Microsoft.AspNetCore.Http
+@using Microsoft.AspNetCore.Http.Authentication
+@using Microsoft.AspNetCore.Identity
+@model LoginViewModel
+@inject SignInManager<IdentityUser> SignInManager
+
+@{
+    ViewData["Title"] = "Log in";
+}
+
+<h2>@ViewData["Title"]</h2>
+<div class="row">
+    <div class="col-md-4">
+        <section>
+            <form asp-route-returnurl="@ViewData["ReturnUrl"]" method="post">
+                <h4>Use a local account to log in.</h4>
+                <hr />
+                <div asp-validation-summary="All" class="text-danger"></div>
+                <div class="form-group">
+                    <label asp-for="Username"></label>
+                    <input asp-for="Username" class="form-control" />
+                    <span asp-validation-for="Username" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Password"></label>
+                    <input asp-for="Password" class="form-control" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <div class="checkbox">
+                        <label asp-for="RememberMe">
+                            <input asp-for="RememberMe" />
+                            @Html.DisplayNameFor(m => m.RememberMe)
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-default">Log in</button>
+                </div>
+            </form>
+        </section>
+    </div>
+    <div class="col-md-6 col-md-offset-2">
+        <h4>Demo Accounts</h4>
+        <div class="row">
+            <div class="col-md-2"><strong>Username</strong></div>
+            <div class="col-md-3"><strong>Password</strong></div>
+            <div class="col-md-3"><strong>Role</strong></div>
+            <div class="col-md-4"><strong>Can View MiniProfiler</strong></div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-2">Allison</div>
+            <div class="col-md-3">Pizza1234$</div>
+            <div class="col-md-3">Stock Analyst</div>
+            <div class="col-md-4">No</div>
+        </div>
+        <div class="row">
+            <div class="col-md-2">Patrick</div>
+            <div class="col-md-3">Cheeseburger1234$</div>
+            <div class="col-md-3">Stock Analyst</div>
+            <div class="col-md-4">No</div>
+        </div>
+        <div class="row">
+            <div class="col-md-2">Thomas</div>
+            <div class="col-md-3">Pasta1234$</div>
+            <div class="col-md-3">Dev Team</div>
+            <div class="col-md-4">Yes</div>
+        </div>
+        <div class="row">
+            <div class="col-md-2">Sabrina</div>
+            <div class="col-md-3">Donut1234$</div>
+            <div class="col-md-3">Dev Team</div>
+            <div class="col-md-4">Yes</div>
+        </div>
+        <br />
+        <br/> 
+        Accounts are for demonstration purposes only with passwords shown here for convenience.  
+        In production applications take care to not expose usernames or passwords and use string passwords for all accounts.
+    </div>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}
